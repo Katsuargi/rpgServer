@@ -459,18 +459,29 @@ function addStam(){
 function saveData(){
     player.inventory = inventory;
     player.questFlags = quests;
-    player.saveCode = (Math.random().toString(36)+'00000000000000000').slice(2, 10+2); 
-    //const playerSend = JSON.stringify(player);
-    console.log(player);
-    $.ajax({
-        url:"/save",
-        type:"POST",
-        //data: playerSend,
-        data: JSON.stringify(player),
-        headers: {
-            'Content-Type': 'application/json'
-        },
-    });
+    if (player.saveCode == "password"){
+        player.saveCode = (Math.random().toString(36)+'00000000000000000').slice(2, 10+2); 
+        //const playerSend = JSON.stringify(player);
+        console.log(player);
+        $.ajax({
+            url:"/save",
+            type:"POST",
+            //data: playerSend,
+            data: JSON.stringify(player),
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        });
+    } else {
+        $.ajax({
+            url:"/update",
+            type:"PUT",
+            data: JSON.stringify(player),
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        });
+    }
     alert("Your code is " + player.saveCode);
 }
 
@@ -480,12 +491,8 @@ async function loadData() {
     console.log(codes.save);
     //import data
     response = $.ajax({
-        url:"/load",
-        type:"POST",
-        data: JSON.stringify(codes),
-        headers: {
-            'Content-Type': 'application/json'
-        },
+        url:"/load/" + codes.save,
+        type:"GET",
     }).then(lplayer => {
         player = lplayer;
         console.log(player);
